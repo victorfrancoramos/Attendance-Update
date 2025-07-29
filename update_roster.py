@@ -41,7 +41,7 @@ ROSTER_FILE = 'sabacloud_roster.csv'
 UPDATED_ROSTER_FILE = 'updated_sabacloud_roster.csv'
 UNMATCHED_FILE = 'unmatched_attendees.txt'
 SKIP_ROWS = 3          # Zoom CSV attendance file: skip the first 3 lines
-FUZZY_THRESHOLD = 50   # Fuzzy matching threshold
+FUZZY_THRESHOLD = 55   # Fuzzy matching threshold
 
 
 # ---------------------------
@@ -86,9 +86,10 @@ def process_attendance(zoom_df: pd.DataFrame, roster_df: pd.DataFrame, threshold
     for name in zoom_df['Name (original name)']:
         match = match_student(name, roster_names, threshold)
         if match:
+            print(f"  ✅ {name} > {match}")
             matched_students[name] = match
         else:
-            print(f"⚠️ Could not match Zoom attendee '{name}' to any roster student.")
+            print(f"  ⚠️ {name} ⚠️")
             unmatched_attendees.append(name)
 
     return matched_students, unmatched_attendees
@@ -103,7 +104,7 @@ def write_unmatched_attendees(unmatched: list, threshold: int, file: str):
         f.write("Unmatched Zoom Attendees:\n")
         for attendee in unmatched:
             f.write(f"{attendee}\n")
-    print(f"✅ Unmatched attendees have been saved to '{file}'.")
+    print(f"💾 Unmatched attendees have been saved to '{file}'.")
 
 
 def update_attendance_status(roster_df: pd.DataFrame, matched: dict, status: str = 'Successful') -> pd.DataFrame:
@@ -128,6 +129,7 @@ def main():
     roster_df = load_roster_data(ROSTER_FILE)
 
     # Process attendance with fuzzy matching
+    print(f"🔄 ZOOM > SABA. Updated ZOOM attendees with roster names using a threshold of {FUZZY_THRESHOLD}.")
     matched_students, unmatched_attendees = process_attendance(zoom_df, roster_df, FUZZY_THRESHOLD)
     write_unmatched_attendees(unmatched_attendees, FUZZY_THRESHOLD, UNMATCHED_FILE)
 
@@ -136,7 +138,7 @@ def main():
 
     # Save updated roster to CSV file
     updated_roster_df.to_csv(UPDATED_ROSTER_FILE, index=False)
-    print(f"✅ Updated roster saved to '{UPDATED_ROSTER_FILE}'.")
+    print(f"💾 Updated roster saved to '{UPDATED_ROSTER_FILE}'.")
 
 
 if __name__ == "__main__":
