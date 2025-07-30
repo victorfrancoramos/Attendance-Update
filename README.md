@@ -10,7 +10,11 @@ This script automates the process of updating attendance records by integrating 
   - Renaming the "Audience Subtype" column to "Attendance Status" for tracking attendance updates.
 - Uses fuzzy matching (with the RapidFuzz library) to map Zoom attendee names to the roster's "Full Name" based on a configurable matching threshold.
 - Logs any unmatched Zoom attendees to a text file, including the fuzzy matching threshold used for review.
-- Updates the attendance status of matched students to "Successful" in the roster.
+- Update the attendance status of students in the roster:
+   - If a matching ZOOM record (or records) is found (via fuzzy matching) and the "Total duration (minutes)"
+    is equal or greater than a defined threshold, the attendance status is set to "Successful".
+   - If there is a match but the total duration is below the threshold, the status is set to "Unsuccessful".
+   - If no matching ZOOM record is found, the status is set to "No Show".
 - Saves the updated roster to a new CSV file.
 
 ## Workflow
